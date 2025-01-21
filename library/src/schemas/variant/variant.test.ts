@@ -17,6 +17,7 @@ import { number } from '../number/index.ts';
 import { object } from '../object/index.ts';
 import { strictObject } from '../strictObject/index.ts';
 import { string } from '../string/index.ts';
+import { intersect } from '../intersect/index.ts';
 import { variant, type VariantSchema } from './variant.ts';
 
 describe('variant', () => {
@@ -905,6 +906,22 @@ describe('variant', () => {
           },
         ],
       } satisfies PartialDataset<InferOutput<Schema>, InferIssue<Schema>>);
+    });
+
+    test('for multiple typed objects', () => {
+      expectNoSchemaIssue(
+        intersect([
+          strictObject({
+            propA: string()
+          }),
+          variant('type', [
+            strictObject({ type: literal('foo'), propB: string() }),
+          ]),
+        ]),
+        [
+          { type: 'foo', propA: 'hello', propB: 'yo' },
+        ]
+      );
     });
   });
 });
